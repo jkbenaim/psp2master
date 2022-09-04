@@ -27,11 +27,11 @@
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(*x))
 
-#define PREFIX ""
-
 const char bootname[] = "PSP_GAME/SYSDIR/BOOT.BIN";
 const char ebootname[] = "PSP_GAME/SYSDIR/EBOOT.BIN";
 const size_t layersize = 906362880ULL;
+
+#define PATHSEP "\\"
 
 struct {
 	size_t isosize;
@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
 	char *outdir = NULL;
 	int rc;
 	int outdir_fd = -1;
+	char pathbuf[BUFSIZ];
 
 #ifdef __MINGW32__
 	char *temp;
@@ -83,12 +84,17 @@ int main(int argc, char *argv[])
 	if (temp) *temp = '\0';
 #endif
 
-	while ((rc = getopt(argc, argv, "i:")) != -1)
+	while ((rc = getopt(argc, argv, "i:d:")) != -1)
 		switch (rc) {
 		case 'i':
 			if (infilename)
 				usage();
 			infilename = optarg;
+			break;
+		case 'd':
+			if (outdir)
+				usage();
+			outdir = optarg;
 			break;
 		default:
 			usage();
@@ -102,7 +108,7 @@ int main(int argc, char *argv[])
 
 	struct stat sb;
 	rc = stat(infilename, &sb);
-	if (rc == -1) err(1, "couldn't stat '%s'", infilename);
+	if (rc == -1) err(1, "couldn't find '%s'", infilename);
 
 	gameinfo.isosize = sb.st_size;
 	if (gameinfo.isosize > layersize) {
@@ -111,6 +117,15 @@ int main(int argc, char *argv[])
 		gameinfo.layers = 1;
 	}
 	
+	if (outdir) {
+		rc = stat(outdir, &sb);
+		if (!S_ISDIR(sb.st_mode)) {
+			errx(1, "output directory '%s' was specified, but it is not a directory", outdir);
+		}
+	} else {
+		outdir = ".";
+	}
+
 	int infd = open(infilename, O_RDONLY|O_BINARY);
 	if (infd == -1) err(1, "couldn't open '%s' for reading", infilename);
 
@@ -158,21 +173,20 @@ int main(int argc, char *argv[])
 	z = pspDecryptPRX(ebootbuf, bootbuf, ISO_BLOCKSIZE * gameinfo.eboot_secsize, NULL, false);
 	if (z < 0) errx(1, "couldn't decrypt eboot");
 
-	int htmlfd = open(PREFIX "GAMEINFO.HTM", O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0644);
+	snprintf(pathbuf, BUFSIZ, "%s%s%s", outdir, PATHSEP, "GAMEINFO.HTM");
+	int htmlfd = open(pathbuf, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0644);
 	if (htmlfd == -1) err(1, "couldn't open '%s' for writing", "GAMEINFO.HTM");
 	rc = make_html(ctx, htmlfd);
 	close(htmlfd);
 	if (rc) {
-		unlink(PREFIX "GAMEINFO.HTM");
+		unlink(pathbuf);
 	}
 
 	iso9660_close(ctx);
 	ctx = NULL;
-/*
-	outdir_fd = open(outdir, O_DIRECTORY|O_PATH);
-	if (outdir_fd == -1) err(1, "couldn't open '%s' as outdir", outdir);
-*/
-	int outfd = open(PREFIX "USER_L0.IMG", O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0644);
+
+	snprintf(pathbuf, BUFSIZ, "%s%s%s", outdir, PATHSEP, "USER_L0.IMG");
+	int outfd = open(pathbuf, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0644);
 	if (outfd == -1) err(1, "couldn't open '%s' for writing", "USER_L0.IMG");
 
 	uint8_t buf[BUFSIZ];
@@ -204,7 +218,8 @@ int main(int argc, char *argv[])
 			if (readsz != writesz) errx(1, "wtf");
 			bytes -= readsz;
 		}
-		layer2_fd = open(PREFIX "USER_L1.IMG", O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0644);
+		snprintf(pathbuf, BUFSIZ, "%s%s%s", outdir, PATHSEP, "USER_L1.IMG");
+		layer2_fd = open(pathbuf, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0644);
 		if (layer2_fd == -1) err(1, "couldn't open '%s' for writing", "USER_L1.IMG");
 		bytes = gameinfo.isosize - layersize;
 		while (bytes) {
@@ -229,7 +244,8 @@ int main(int argc, char *argv[])
 	close(outfd);
 	infd = outfd = -1;
 
-	struct MappedFile_s m = MappedFile_Create(PREFIX "CONT_L0.IMG", cont_l0_img_size);
+	snprintf(pathbuf, BUFSIZ, "%s%s%s", outdir, PATHSEP, "CONT_L0.IMG");
+	struct MappedFile_s m = MappedFile_Create(pathbuf, cont_l0_img_size);
 	if (!m.data) err(1, "couldn't create CONT_L0.IMG");
 	memcpy(m.data, cont_l0_img, cont_l0_img_size);
 
@@ -258,7 +274,8 @@ int main(int argc, char *argv[])
 	MappedFile_Close(m);
 	m.data = NULL;
 
-	m = MappedFile_Create(PREFIX "MDI.IMG", mdi_img_size);
+	snprintf(pathbuf, BUFSIZ, "%s%s%s", outdir, PATHSEP, "MDI.IMG");
+	m = MappedFile_Create(pathbuf, mdi_img_size);
 	if (!m.data) err(1, "couldn't create MDI.IMG");
 	memcpy(m.data, mdi_img, mdi_img_size);
 	struct mdi_s *mdi = (struct mdi_s *)m.data;
@@ -278,7 +295,8 @@ int main(int argc, char *argv[])
 	MappedFile_Close(m);
 	m.data = NULL;
 
-	m = MappedFile_Create(PREFIX "UMD_AUTH.DAT", umd_auth_dat_size);
+	snprintf(pathbuf, BUFSIZ, "%s%s%s", outdir, PATHSEP, "UMD_AUTH.DAT");
+	m = MappedFile_Create(pathbuf, umd_auth_dat_size);
 	if (!m.data) err(1, "couldn't create UMD_AUTH.DAT");
 	memcpy(m.data, umd_auth_dat, umd_auth_dat_size);
 	struct umd_auth_s *umd_auth = (struct umd_auth_s *)m.data;
@@ -309,7 +327,7 @@ int main(int argc, char *argv[])
 
 static void noreturn usage(void)
 {
-	(void)fprintf(stderr, "usage: %s -i in.iso -o out.iso\n",
+	(void)fprintf(stderr, "usage: %s -i <pspgame.iso> [-d <dirname>]\n",
 		__progname
 	);
 	exit(EXIT_FAILURE);
