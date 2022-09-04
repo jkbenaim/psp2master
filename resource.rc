@@ -1,0 +1,29 @@
+#include <windows.h>
+#include "version.h"
+
+1 VERSIONINFO
+FILEVERSION    PSP2MASTER_VERSION_MAJOR,PSP2MASTER_VERSION_MINOR,0,0
+PRODUCTVERSION PSP2MASTER_VERSION_MAJOR,PSP2MASTER_VERSION_MINOR,0,0
+FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+FILEFLAGS 0
+FILEOS VOS_NT
+FILETYPE VFT_APP
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "040904E4"
+		BEGIN
+			VALUE "FileVersion", PSP2MASTER_VERSION_STRING
+			VALUE "FileDescription", "psp2master"
+			VALUE "ProductName", "psp2master"
+			VALUE "OriginalFilename", "psp2master.exe"
+			VALUE "LegalCopyright", "\xa9 jrra 2022. GPLv2"
+			VALUE "Comments", "https://jrra.zone/psp2master"
+		END
+	END
+
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 0x409, 1252
+	END
+END

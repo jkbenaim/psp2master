@@ -6,6 +6,7 @@ HOST = i686-w64-mingw32
 CC = ${HOST}-gcc
 CXX = ${HOST}-g++
 LD = ${HOST}-ld
+WINDRES = ${HOST}-windres
 
 target  ?= psp2master
 objects := $(patsubst %.c,%.o,$(wildcard *.c)) data.o
@@ -40,7 +41,10 @@ distclean: clean
 data.o: data/cont_l0.img data/mdi.img data/umd_auth.dat
 	$(LD) -r -b binary data/* -o $@
 
-$(target): $(objects) lib/pspdecrypt.a libcdio-install/lib/libiso9660.a libcdio-install/lib/libcdio.a data.o
+resource.o: resource.rc
+	$(WINDRES) $< -o $@
+
+$(target): $(objects) lib/pspdecrypt.a libcdio-install/lib/libiso9660.a libcdio-install/lib/libcdio.a data.o resource.o
 
 
 
