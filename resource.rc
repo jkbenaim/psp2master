@@ -17,7 +17,7 @@ BEGIN
 			VALUE "FileDescription", "psp2master"
 			VALUE "ProductName", "psp2master"
 			VALUE "OriginalFilename", "psp2master.exe"
-			VALUE "LegalCopyright", "\xa9 jrra 2022. GPLv2"
+			VALUE "LegalCopyright", "\xa9 Jason Benaim 2022. GPLv2"
 			VALUE "Comments", "https://jrra.zone/psp2master"
 		END
 	END

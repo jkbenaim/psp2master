@@ -24,6 +24,7 @@
 #include "makehtml.h"
 #include "mapfile.h"
 #include "prxdecrypt.h"
+#include "version.h"
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(*x))
 
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
 	if (temp) *temp = '\0';
 #endif
 
-	while ((rc = getopt(argc, argv, "i:d:")) != -1)
+	while ((rc = getopt(argc, argv, "i:d:V")) != -1)
 		switch (rc) {
 		case 'i':
 			if (infilename)
@@ -95,6 +96,10 @@ int main(int argc, char *argv[])
 			if (outdir)
 				usage();
 			outdir = optarg;
+			break;
+		case 'V':
+			fprintf(stderr, PSP2MASTER_EMBLEM);
+			exit(0);
 			break;
 		default:
 			usage();

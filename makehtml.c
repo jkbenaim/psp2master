@@ -49,53 +49,6 @@ th:nth-child(1),th:nth-child(2) {width:150px;}
 .note {color: gray; border-bottom: 1px dotted;}
 .keydesc {color: gray; font-style: italic;}
 </style>
-
-<script id="lang-fi" type="application/json">
-{
-	"APP_VER": "Sovellusversio",
-	"BOOTABLE": "Voidaan bootata"
-}
-</script>
-
-<script type="application/json" id="rfc5646">
-{
-	"ja": 0,
-	"en": 1,
-	"fr": 2,
-	"es": 3,
-	"de": 4,
-	"it": 5,
-	"nl": 6,
-	"pt": 7,
-	"ru": 8,
-	"ko": 9,
-	"ch": 10,
-	"zh": 11
-}
-</script>
-
-<script type="text/javascript">
-function localize(lang) {
-	const strtab = JSON.parse(document.getElementById("lang-" + lang).text);
-	let params = document.getElementById('params').getElementsByTagName('tbody')[0];
-	let rows = params.getElementsByTagName('tr');
-
-	for (let r of rows) {
-		let keytag = r.getElementsByClassName('key')[0];
-		let key = keytag.textContent;
-		if (strtab.hasOwnProperty(key)) {
-			keytag.innerHTML += '<br/><span class="keydesc">' + strtab[key] + '</span>';
-		}
-	}
-	console.log(strtab);
-};
-
-function boot() {
-	//localize('fi');
-}
-document.addEventListener("DOMContentLoaded", boot);
-
-</script>
 </head>
 <body>
 

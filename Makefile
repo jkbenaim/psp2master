@@ -9,7 +9,7 @@ LD = ${HOST}-ld
 WINDRES = ${HOST}-windres
 
 target  ?= psp2master
-objects := $(patsubst %.c,%.o,$(wildcard *.c)) data.o
+objects := $(patsubst %.c,%.o,$(wildcard *.c)) data.o resource.o
 
 #libs:=libiso9660
 libs := openssl
@@ -47,7 +47,7 @@ resource.o: resource.rc
 README: ${target}.1
 	MANWIDTH=77 man --nh --nj ./${target}.1 | col -b > $@
 
-$(target): $(objects) lib/pspdecrypt.a libcdio-install/lib/libiso9660.a libcdio-install/lib/libcdio.a data.o resource.o
+$(target): $(objects) lib/pspdecrypt.a libcdio-install/lib/libiso9660.a libcdio-install/lib/libcdio.a data.o
 
 
 
