@@ -1,0 +1,47 @@
+--- a/Makefile	2022-09-04 01:44:51.328169702 -0700
++++ b/Makefile	2022-09-04 01:45:50.773654217 -0700
+@@ -1,19 +1,19 @@
+-CC=clang
+-CXX=clang++
+-#EXTRA_FLAG= -lprofiler
+-EXTRA_FLAG=
+-CFLAGS=-O3
+-CXXFLAGS=-O3
++target = pspdecrypt.a
++CFLAGS=-flto -Os -ggdb
++CXXFLAGS=-flto -Os -ggdb
++HOST = i686-w64-mingw32
++CC = ${HOST}-gcc
++CXX = ${HOST}-g++
++LD = ${HOST}-ld
+ 
+-BIN=pspdecrypt
+ LIBKIRK_SRCS=$(wildcard libkirk/*.c)
+-OBJS=libLZR.o kl4e.o common.o syscon_ipl_keys.o ipl_decrypt.o pspdecrypt_lib.o PrxDecrypter.o pspdecrypt.o PsarDecrypter.o $(LIBKIRK_SRCS:%.c=%.o)
++OBJS=libLZR.o kl4e.o common.o syscon_ipl_keys.o ipl_decrypt.o pspdecrypt_lib.o PrxDecrypter.o PsarDecrypter.o $(LIBKIRK_SRCS:%.c=%.o)
+ 
+-all: $(BIN)
++all: $(target)
+ 
+-$(BIN): $(OBJS)
+-	$(CXX) $(EXTRA_FLAG) -o $@ $(OBJS) -lz -lcrypto
++$(target): $(OBJS)
++	$(AR) r $@ $^
+ 
+ .PHONY: clean
+ clean:
+-	-rm -f $(BIN) $(OBJS)
++	-rm -f $(target) $(OBJS)
+diff --git a/PrxDecrypter.h b/PrxDecrypter.h
+index 8a2412c..799c615 100644
+--- a/PrxDecrypter.h
++++ b/PrxDecrypter.h
+@@ -64,5 +64,6 @@ typedef struct
+ #ifdef _MSC_VER
+ #pragma pack(pop)
+ #endif
+-
++extern "C" {
+ int pspDecryptPRX(const u8 *inbuf, u8 *outbuf, u32 size, const u8 *seed = nullptr, bool verbose = false);
++}
+
