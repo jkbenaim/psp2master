@@ -81,4 +81,4 @@ $(PSPDECRYPT_NAME)/pspdecrypt.a: $(PSPDECRYPT_NAME)/Makefile
 
 $(PSPDECRYPT_NAME)/Makefile: libraries/$(PSPDECRYPT_NAME).tar.gz
 	tar -zxvf $<
-	patch -d $(PSPDECRYPT_NAME) -p1 -i ../libraries/ppp.diff
+	patch -d $(PSPDECRYPT_NAME) -p1 -i ../libraries/pspdecrypt-make-library.diff
