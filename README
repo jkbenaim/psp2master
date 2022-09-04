@@ -1,0 +1,32 @@
+psp2master(1)		  General Commands Manual	      psp2master(1)
+
+NAME
+       psp2master - produce UMD® master data from a PSP® game image
+
+SYNOPSIS
+       psp2master -i game.iso [-d outdir]
+
+DESCRIPTION
+       psp2master will create UMD® master data from a given PSP® game iso.
+       Master data is suitable for use on a PSP® TOOL system, such as the
+       DTP-H1500 or DTP-T1000.
+
+       The options to psp2master are:
+
+       -i     Specifies the PSP® game image to be used.
+
+       -d     Specifies the output directory for the UMD® master data. If
+	      not specified, the current directory will be used.
+
+AUTHOR
+       Jason Benaim <jkbenaim@gmail.com>
+
+COPYRIGHT
+       Copyright © 2022 Jason Benaim.
+       Licensed under the GNU GPL version 3 or later.
+       This is free software; you are free to change and redistribute it.
+       There is NO WARRANTY, to the extent permitted by law.
+       "PlayStation", "PSP" and "UMD" are registered trademarks of Sony
+       Computer Entertainment Inc.
+
+psp2master		       September 2022		      psp2master(1)

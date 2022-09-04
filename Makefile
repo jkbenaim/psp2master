@@ -44,6 +44,9 @@ data.o: data/cont_l0.img data/mdi.img data/umd_auth.dat
 resource.o: resource.rc
 	$(WINDRES) $< -o $@
 
+README: ${target}.1
+	MANWIDTH=77 man --nh --nj ./${target}.1 | col -b > $@
+
 $(target): $(objects) lib/pspdecrypt.a libcdio-install/lib/libiso9660.a libcdio-install/lib/libcdio.a data.o resource.o
 
 
